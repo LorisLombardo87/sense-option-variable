@@ -1,0 +1,9 @@
+{
+	"name" : "optionVariable",
+	"description" : "Set a variable with predefined options",
+	"icon" : "",
+	"type" : "visualization",
+	"version": "0.0.1",
+	"preview" : "optionvariable.png",
+	"author": "Loris Lombardo"
+}

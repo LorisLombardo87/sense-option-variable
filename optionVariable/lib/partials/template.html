@@ -1,0 +1,27 @@
+<div class = "bootstrap_inside" qv-extension>
+
+	<div class="form-group" ng-if = "layout.props.optionsType=='d'">
+    	<label for="select-{{layout.props.variableName}}">{{layout.props.variableTitle}}</label>
+		<select 
+			id = "select-{{layout.props.variableName}}" 
+		  	ng-model = "variableValue" 
+		  	class="form-control" 
+		  	ng-options="item.value as item.label for item in values" 
+			title = "{{layout.props.variableDesc}}"
+			ng-disabled = "layout.props.disabled"
+			ng-change = "changeVar(variableValue)">
+		</select>
+	</div>
+
+	<div class="form-group" ng-if = "layout.props.optionsType=='c'">
+		<label>{{layout.props.variableTitle}}</label>
+		<div class="radio" ng-repeat = "item in values">
+			<label>
+			    <input type="radio" ng-click = "changeVar(item.value)" ng-checked="variableValue == item.value">
+			    {{item.label}}
+			</label>
+			<br/>
+		</div>
+	</div>
+
+</div>
