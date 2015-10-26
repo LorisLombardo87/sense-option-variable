@@ -73,6 +73,10 @@ define( [], function () {
 			{
 				value: "c",
 				label: "Check boxes"
+			}, 
+			{
+				value: "l",
+				label: "Cycle Button"
 			}
 		]
 	};

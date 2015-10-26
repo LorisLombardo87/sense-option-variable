@@ -30,40 +30,56 @@ function ($, qlik, props, initProps, extensionUtils, cssContent, template, templ
         controller: ['$scope', function ($scope) {
 
             $scope.variableValue = '';
+            $scope.variableValueDesc = '';
+            $scope.variableIndex = 0;
+
             $scope.values = [];
+
+            $scope.varValues = [];
+            $scope.varDescs = [];
+            $scope.useDesc = false;
+
+            $scope.menuOpen = false;
+
             var app = qlik.currApp(this);
 
             $scope.setUp = function(){
-                app.variable.getContent($scope.layout.props.variableName,function ( reply ) {
-                    //console.log('r',reply);
-                    $scope.variableValue = reply.qContent.qString;   
-                    
-                } );
 
-                //item.value as item.label for item in values
                 $scope.values = [];
 
-                var vs = $scope.layout.props.variableOptionValue.split(","),
-                    vl = $scope.layout.props.variableOptionDesc.split(","),
-                    useDesc = vs.length == vl.length;
-                // console.log('vs',vs);
-                // console.log('vl',vl);
+                $scope.varValues = $scope.layout.props.variableOptionValue.split(",");
+                $scope.varDescs = $scope.layout.props.variableOptionDesc.split(",");
+                $scope.useDesc = $scope.varValues.length == $scope.varDescs.length;
+
+                // console.log('varValues',varValues);
+                // console.log('varDescs',varDescs);
                 // console.log('ud',useDesc);
+
+
+                //item.value as item.label for item in values               
                 
-                angular.forEach(vs, function(value, key) {
+                angular.forEach($scope.varValues, function(value, key) {
                     var item = {
                         value: '',
                         label: ''
                     };
                     item.value = value;
                     item.label = value;
-                    if(useDesc){
-                        item.label = vl[key];
+                    if($scope.useDesc){
+                        item.label = $scope.varDescs[key];
                     }
 
                     $scope.values.push(item);
                 });
-                console.log('v',$scope.values);
+
+                app.variable.getContent($scope.layout.props.variableName,function ( reply ) {
+                    //console.log('r',reply);
+                    $scope.variableValue = reply.qContent.qString; 
+                    $scope.variableIndex = $scope.varValues.indexOf($scope.variableValue);
+                    $scope.variableValueDesc = $scope.values[$scope.variableIndex].label;  
+                });
+                //console.log('v',$scope.values);
+                $( ".options-"+$scope.layout.props.variableName ).parents('article').css( "overflow", "visible" );
             };
             $scope.setUp();                    
            
@@ -72,13 +88,31 @@ function ($, qlik, props, initProps, extensionUtils, cssContent, template, templ
 
                 if(!$scope.layout.props.disabled){
                     console.log('mod var', $scope.layout.props.variableName+' = '+val)
-                    app.variable.setContent($scope.layout.props.variableName,val); 
+                    app.variable.setContent($scope.layout.props.variableName,val);
+
                     $scope.variableValue = val;
+                    $scope.variableIndex = $scope.varValues.indexOf(val);
+                    $scope.variableValueDesc = $scope.values[$scope.variableIndex].label;  
                 }
                 else {
                     console.log('mod var disabled', $scope.layout.props.variableName)
                 }
             };
+
+            $scope.cicleVar = function(){
+                $scope.variableIndex++;
+                if($scope.variableIndex >= $scope.values.length){
+                    $scope.variableIndex = 0;
+                }
+                console.log('indx',$scope.variableIndex);
+
+                $scope.changeVar($scope.varValues[$scope.variableIndex]);
+            }
+
+            $scope.openMenu = function(){
+                $( ".options-"+$scope.layout.props.variableName ).parents('article').css( "overflow", "visible" );
+                $scope.menuOpen = !$scope.menuOpen;
+            }
 
             // $scope.$watch( 'layout.props', function ( newVal ) {
             //     $scope.setUp();
