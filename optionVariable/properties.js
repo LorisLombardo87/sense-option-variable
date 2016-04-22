@@ -1,12 +1,36 @@
-define( [], function () {
+define( [
+	'qlik'
+], function (qlik) {
 	'use strict';
+
+	// Borrowed from qsVariable (Erik Wetterberg)
+	// Source: https://github.com/erikwett/qsVariable
+	function createVariable ( name ) {
+		var app = qlik.currApp();
+		//from 2.1: check if variable exists
+		if ( app.variable.getByName ) {
+			app.variable.getByName( name ).then( function () {
+				//variable already exist
+			}, function () {
+				//create variable
+				app.variable.create( name );
+			} );
+		} else {
+			//create variable - ignore errors
+			app.variable.create( name );
+		}
+	}
 
 	
 	var variableName = {
 		ref: "props.variableName",
 		label: "Varible Name",
 		type: "string",
-		expression: "optional",
+		change: function ( data ) {
+			if (data.props.variableName) {
+				createVariable( data.props.variableName );
+			}
+		},
 		show: true
 	};
 
@@ -28,6 +52,8 @@ define( [], function () {
 
 	// variable Panel
 	var variablePanel = {
+		component: "expandable-items",
+		label: "Variable",
 		items: {
 			variable: {
 				type: "items",
@@ -89,12 +115,12 @@ define( [], function () {
 		show: true
 	};
 
-	var appearancePanel = {
+	var visualizationPanel = {
+		component: "expandable-items",
+		label: "Visualization",
 		items: {
-			label: "Settings",
 			settings: {
 				type: "items",
-				label: "Settings",
 				items: {
 					variableTitle: variableTitle,
 					variableDesc: variableDesc,
@@ -105,12 +131,17 @@ define( [], function () {
 		}
 	};
 
+	var appearancePanel = {
+		uses: "settings"
+	};
+
 	// Return values
 	return {
 		type: "items",
 		component: "accordion",
 		items: {
 			variablePanel: variablePanel,
+			visualization: visualizationPanel,
 			appearance: appearancePanel
 		}
 	};
